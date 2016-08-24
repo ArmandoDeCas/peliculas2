@@ -1,6 +1,5 @@
 class MoviesController < ApplicationController
   before_action :set_movie, only: [:show, :edit, :update, :destroy]
-
   # GET /movies
   # GET /movies.json
   def index
@@ -15,6 +14,7 @@ class MoviesController < ApplicationController
   # GET /movies/new
   def new
     @movie = Movie.new
+    @tag = Tag.new
   end
 
   # GET /movies/1/edit
@@ -25,6 +25,10 @@ class MoviesController < ApplicationController
   # POST /movies.json
   def create
     @movie = Movie.new(movie_params)
+    tagstemp = movie_params["tags_ids"].delete_if{ |x|
+      x.empty? }
+    @tags = Tag.find(tagstemp)
+    @movie.tags << @tags
 
     respond_to do |format|
       if @movie.save
@@ -54,6 +58,8 @@ class MoviesController < ApplicationController
   # DELETE /movies/1
   # DELETE /movies/1.json
   def destroy
+
+
     @movie.destroy
     respond_to do |format|
       format.html { redirect_to movies_url, notice: 'Movie was successfully destroyed.' }
@@ -69,6 +75,6 @@ class MoviesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def	movie_params
-    		params.require(:movie).permit(:name,	:tags_ids)
-    end		
+       params.require(:movie).permit(:name, tags_ids: [])
+    end
 end
